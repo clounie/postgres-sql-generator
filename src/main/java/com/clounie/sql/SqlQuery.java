@@ -26,8 +26,19 @@ public class SqlQuery implements SqlSerializable {
    *                               will be used.
    * @return
    */
-  public SqlQuery(TableExpression primaryTableExpression) {
+  private SqlQuery(TableExpression primaryTableExpression) {
     this.primaryTableExpression = primaryTableExpression;
+  }
+
+  public static SqlQuery from(String tableName) {
+    return new SqlQuery(new TableExpression(new TableRef(null, tableName), null));
+  }
+  public static SqlQuery from(String schemaName, String tableName) {
+    return new SqlQuery(new TableExpression(new TableRef(schemaName, tableName), null));
+  }
+
+  public static SqlQuery from(String schemaName, String tableName, String aliasName) {
+    return new SqlQuery(new TableExpression(new TableRef(schemaName, tableName), aliasName));
   }
 
   public SqlQuery select(SelectExpression... selectExpressions) {
@@ -38,6 +49,8 @@ public class SqlQuery implements SqlSerializable {
   /**
    * Utility for adding {@code n} fields to the select. ASSUMPTION: all of these fields belong
    * to the primary table.<br><br>
+   *
+   * Supports jsonb {@code ->>} syntax. For example, one of the fields passed could be {@code myField->>myJsonProperty}
    *
    * @param fields fields to add to select
    * @return this query

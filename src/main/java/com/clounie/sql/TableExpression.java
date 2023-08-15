@@ -1,5 +1,7 @@
 package com.clounie.sql;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Objects;
 
 /**
@@ -15,6 +17,14 @@ public record TableExpression(TableRef tableRef, String aliasName) implements Co
 
   @Override
   public String getSqlForAliasDefinition() {
-    return String.format("%1$s AS %2$s", tableRef.toSql(), aliasName);
+    if (StringUtils.isEmpty(aliasName)) {
+      return toSql();
+    } else {
+      return String.format("%1$s AS %2$s", tableRef.toSql(), aliasName);
+    }
+  }
+
+  public static TableExpression from(String schemaName, String tableName, String aliasName) {
+    return new TableExpression(new TableRef(schemaName, tableName), aliasName);
   }
 }
